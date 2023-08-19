@@ -1,14 +1,25 @@
 from tkinter import Tk # se eliminara esta linea una ves terminado el sistema
 
-from tkinter import Frame,Label,Entry,Button
+from tkinter import Frame,Label,Entry,Button,StringVar,END
+from tkinter import messagebox as mb
 from tkinter.ttk import Treeview
-from Proceso import Proceso
+from Lote import Proceso,Lote
 
 from random import randint
 
 class Ventana():
 	def __init__(self,ventana):
 		self.__ventana = ventana
+
+		self.__procesosLote = 4
+		self.__procesos = []
+		self.__lotes = []
+		self.__operacionSTR = StringVar()
+		self.__noProgramaSTR = StringVar()
+		self.__lotesPendientesSTR = StringVar()
+
+		self.__noProgramaSTR.set("Número de Programa: 0")
+		self.__lotesPendientesSTR.set("Lotes Pendientes: 0")
 
 		""" Frames """
 		self.__topFrame = None
@@ -77,28 +88,34 @@ class Ventana():
 		self.__botRightFrame.grid(row = 0,column = 1,pady = 5,padx = 5)
 
 	def __initLabels(self):
+		""" TopFrameLables """
 		Label(self.__topLeftFrame,text = "Programador").grid(row = 0,column = 0,pady = 5,padx = 5,sticky = "E")
 		Label(self.__topLeftFrame,text = "Tiempo Maximo Estimado").grid(row = 2,column = 0,pady = 5,
 			padx = 5,sticky = "E")
-		self.__noProgramaLabel = Label(self.__topLeftFrame,text = "Número de Programa: 0")
+		self.__noProgramaLabel = Label(self.__topLeftFrame,textvariable = self.__noProgramaSTR)
 		self.__noProgramaLabel.grid(row = 3,column = 0,pady = 5,padx = 5,sticky = "E")
 
-		self.__lotesPendientesLabel = Label(self.__midLeftFrame,text = "Lotes Pendientes: 0")
+		""" MidFrameLables """
+		self.__lotesPendientesLabel = Label(self.__midLeftFrame,textvariable = self.__lotesPendientesSTR)
 		self.__lotesPendientesLabel.grid(row = 0,column = 0,pady = 5,padx = 5)
+		Label(self.__midRightFrame,text = "Lote en ejecución").grid(row = 0,column = 0,pady = 5,padx = 5)
 
+		""" BotFrameLabels """
+		Label(self.__botLeftFrame,text = "Proceso en ejecución").grid(row = 0,column = 0,pady = 5,padx = 5)
 		self.__peNombreLabel = Label(self.__botLeftFrame,text = "Nombre: ")
-		self.__peNombreLabel.grid(row = 0,column = 0,padx = 5)
+		self.__peNombreLabel.grid(row = 1,column = 0,padx = 5,sticky = "W")
 		self.__peOperacionLabel = Label(self.__botLeftFrame,text = "Operación: ")
-		self.__peOperacionLabel.grid(row = 1,column = 0,padx = 5)
+		self.__peOperacionLabel.grid(row = 2,column = 0,padx = 5,sticky = "W")
 		self.__peTMELabel = Label(self.__botLeftFrame,text = "TME: ")
-		self.__peTMELabel.grid(row = 2,column = 0,padx = 5)
+		self.__peTMELabel.grid(row = 3,column = 0,padx = 5,sticky = "W")
 		self.__peNoProgramaLabel = Label(self.__botLeftFrame,text = "NoPrograma: ")
-		self.__peNoProgramaLabel.grid(row = 3,column = 0,padx = 5)
+		self.__peNoProgramaLabel.grid(row = 4,column = 0,padx = 5,sticky = "W")
+		Label(self.__botRightFrame,text = "Procesos terminados").grid(row = 0,column = 0,pady = 5,padx = 5)
 
 	def __initEntrys(self):
 		self.__programadorEntry = Entry(self.__topLeftFrame)
 		self.__programadorEntry.grid(row = 0,column = 1,pady = 5,padx = 5)
-		self.__operacionEntry = Entry(self.__topLeftFrame)
+		self.__operacionEntry = Entry(self.__topLeftFrame,textvariable = self.__operacionSTR)
 		self.__operacionEntry.grid(row = 1,column = 1,pady = 5,padx = 5)
 		self.__TMEEntry = Entry(self.__topLeftFrame)
 		self.__TMEEntry.grid(row = 2,column = 1,pady = 5,padx = 5)
@@ -119,7 +136,7 @@ class Ventana():
 
 		self.__loteEjecucionTable = Treeview(self.__midRightFrame,height = 5,
 			columns = ("No","Programador","Operación","TME","Lote"))
-		self.__loteEjecucionTable.grid(row = 0,column = 0,pady = 5,padx = 5)
+		self.__loteEjecucionTable.grid(row = 1,column = 0,pady = 5,padx = 5)
 		self.__loteEjecucionTable.column("#0",width = 1)
 		self.__loteEjecucionTable.column("No",width = 50)
 		self.__loteEjecucionTable.heading("No",text = "No")
@@ -134,7 +151,7 @@ class Ventana():
 		
 		self.__procesosTerminadosTable = Treeview(self.__botRightFrame,height = 5,
 			columns = ("No","Programador","Operación","Resultado","TME","Lote"))
-		self.__procesosTerminadosTable.grid(row = 0,column = 0,pady = 5,padx = 5)
+		self.__procesosTerminadosTable.grid(row = 1,column = 0,pady = 5,padx = 5)
 		self.__procesosTerminadosTable.column("#0",width = 1)
 		self.__procesosTerminadosTable.column("No",width = 50)
 		self.__procesosTerminadosTable.heading("No",text = "No")
@@ -152,7 +169,7 @@ class Ventana():
 	def __initButtons(self):
 		self.__agregarButton = Button(self.__topLeftFrame,text = "Agregar",command = lambda:self.__agregarProceso())
 		self.__agregarButton.grid(row = 3,column = 1,pady = 5,padx = 5)
-		self.__simulacionButton = Button(self.__midLeftFrame,text = "Comienza Simulación",
+		self.__simulacionButton = Button(self.__midLeftFrame,text = "Comienza Eimulación",
 			command = lambda:self.__simular())
 		self.__simulacionButton.grid(row = 1,column = 0,pady = 5,padx = 5)
 		Button(self.__topLeftFrame,text = "Operación",command = lambda:self.__generaOperacion()).grid(row = 1,
@@ -161,10 +178,29 @@ class Ventana():
 	def __generaOperacion(self):
 		operadores = ["+","-","/","*","%","^"]
 		operacion = str(randint(0,100)) + operadores[randint(0,5)] + str(randint(0,100))
-		# Aqui hay que agregar el codigo para que se agregue la operacion en el Entry
+		self.__operacionSTR.set(operacion)
 
 	def __agregarProceso(self):
-		pass
+		try:
+			programador = self.__programadorEntry.get()
+			operacion = self.__operacionEntry.get()
+			TME = int(self.__TMEEntry.get())
+			proceso = Proceso(programador,operacion,TME,len(self.__procesos))
+			lenLotes = len(self.__lotes)
+			# Se verifica si el lote esta vacio
+			if lenLotes == 0 or self.__lotes[-1].lleno():
+				self.__lotes.append(Lote(lenLotes+1))
+			self.__lotes[-1].agregar(proceso)
+			self.__procesos.append(proceso)
+			data = [proceso.dameNoPrograma(),proceso.dameProgramador(),
+				proceso.dameOperacion(),proceso.dameTiempoEstimadoSegundos()]
+			self.__aniadeTabla(self.__todosProcesosTable,data)
+			self.__noProgramaSTR.set(f"Número de Programa: {len(self.__procesos)}")
+		except ValueError as e:
+			mb.showerror(
+				"¡¡ERROR!!",
+				"Debes ingresar un número en \"Tiempo Maximo Estimado\""
+			)
 
 	def __crearProcesos(self,n):
 		operadores = ["+","-","/","*","%","^"]
@@ -174,11 +210,20 @@ class Ventana():
 			self.__procesosList.append(proceso)
 
 	def __simular(self):
-		pass
+		try:
+			pass
+		except IndexError as e:
+			mb.showerror(
+				"¡¡ERROR!!",
+				"Debes ingresar por lo menos 1 proceso"
+			)
 
 	def __vaciarTabla(self,tabla):
 		for i in tabla.get_children():
 			tabla.delete(i)
+
+	def __aniadeTabla(self,tabla,data):
+		tabla.insert('',END,values = data)
 
 	def dibujar(self):
 		self.__ventana.mainloop()
