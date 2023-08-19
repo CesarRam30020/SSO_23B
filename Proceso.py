@@ -10,7 +10,6 @@ class Proceso():
 		self.__n1 = float(self.operacion[:pos[0]])
 		self.__n2 = float(self.operacion[pos[1]:])
 		self.__tipo = self.operacion[pos[0]:pos[1]]
-		
 
 	def getN1(self):
 		return self.__n1
