@@ -4,9 +4,10 @@ class Lote():
 	def __init__(self, numLote = 0, procesos = []):
 		self.__num = numLote
 		self.__procesos = []
+		self.__maxProcesos = 4
 
 	def agregar(self,proceso):
-		valido = len(self.__procesos) < 4
+		valido = len(self.__procesos) < self.__maxProcesos
 		if valido:
 			self.__procesos.append(proceso)
 		return valido
@@ -21,7 +22,7 @@ class Lote():
 		return self.__num
 
 	def lleno(self):
-		return len(self.__procesos) >= 4
+		return len(self.__procesos) >= self.__maxProcesos
 
 	def __str__(self):
 		s = "Numero de Lote: "+str(self.__num)+"\n"
