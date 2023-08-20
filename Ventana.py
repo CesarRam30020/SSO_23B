@@ -1,25 +1,37 @@
-from tkinter import Tk # se eliminara esta linea una ves terminado el sistema
-
 from tkinter import Frame,Label,Entry,Button,StringVar,END
 from tkinter import messagebox as mb
 from tkinter.ttk import Treeview
 from Lote import Proceso,Lote
-
 from random import randint
+from time import sleep
 
 class Ventana():
-	def __init__(self,ventana):
+	def __init__(self,ventana,titulo = "Emulador de Procesamiento por Lotes"):
 		self.__ventana = ventana
+		self.__ventana.title(titulo)
 
 		self.__procesosLote = 4
 		self.__procesos = []
 		self.__lotes = []
+
 		self.__operacionSTR = StringVar()
 		self.__noProgramaSTR = StringVar()
 		self.__lotesPendientesSTR = StringVar()
+		self.__peNombreSTR = StringVar()
+		self.__peOperacionSTR = StringVar()
+		self.__peTMESTR = StringVar()
+		self.__peTTESTR = StringVar()
+		self.__peTRESTR = StringVar()
+		self.__peNoProgramaSTR = StringVar()
 
 		self.__noProgramaSTR.set("Número de Programa: 0")
 		self.__lotesPendientesSTR.set("Lotes Pendientes: 0")
+		self.__peNombreSTR.set("Nombre: ")
+		self.__peOperacionSTR.set("Operación: ")
+		self.__peTMESTR.set("TME: ")
+		self.__peTTESTR.set("TTE: ")
+		self.__peTRESTR.set("TRE: ")
+		self.__peNoProgramaSTR.set("NoPrograma: ")
 
 		""" Frames """
 		self.__topFrame = None
@@ -42,6 +54,8 @@ class Ventana():
 		self.__peNombreLabel = None
 		self.__peOperacionLabel = None
 		self.__peTMELabel = None
+		self.__peTTELabel = None
+		self.__peTRELabel = None
 		self.__peNoProgramaLabel = None
 
 		""" Entrys """
@@ -102,14 +116,18 @@ class Ventana():
 
 		""" BotFrameLabels """
 		Label(self.__botLeftFrame,text = "Proceso en ejecución").grid(row = 0,column = 0,pady = 5,padx = 5)
-		self.__peNombreLabel = Label(self.__botLeftFrame,text = "Nombre: ")
+		self.__peNombreLabel = Label(self.__botLeftFrame,textvariable = self.__peNombreSTR)
 		self.__peNombreLabel.grid(row = 1,column = 0,padx = 5,sticky = "W")
-		self.__peOperacionLabel = Label(self.__botLeftFrame,text = "Operación: ")
+		self.__peOperacionLabel = Label(self.__botLeftFrame,textvariable = self.__peOperacionSTR)
 		self.__peOperacionLabel.grid(row = 2,column = 0,padx = 5,sticky = "W")
-		self.__peTMELabel = Label(self.__botLeftFrame,text = "TME: ")
+		self.__peTMELabel = Label(self.__botLeftFrame,textvariable = self.__peTMESTR)
 		self.__peTMELabel.grid(row = 3,column = 0,padx = 5,sticky = "W")
-		self.__peNoProgramaLabel = Label(self.__botLeftFrame,text = "NoPrograma: ")
-		self.__peNoProgramaLabel.grid(row = 4,column = 0,padx = 5,sticky = "W")
+		self.__peTTELabel = Label(self.__botLeftFrame,textvariable = self.__peTTESTR)
+		self.__peTTELabel.grid(row = 4,column = 0,padx = 5,sticky = "W")
+		self.__peTRELabel = Label(self.__botLeftFrame,textvariable = self.__peTRESTR)
+		self.__peTRELabel.grid(row = 5,column = 0,padx = 5,sticky = "W")
+		self.__peNoProgramaLabel = Label(self.__botLeftFrame,textvariable = self.__peNoProgramaSTR)
+		self.__peNoProgramaLabel.grid(row = 6,column = 0,padx = 5,sticky = "W")
 		Label(self.__botRightFrame,text = "Procesos terminados").grid(row = 0,column = 0,pady = 5,padx = 5)
 
 	def __initEntrys(self):
@@ -174,6 +192,9 @@ class Ventana():
 		self.__simulacionButton.grid(row = 1,column = 0,pady = 5,padx = 5)
 		Button(self.__topLeftFrame,text = "Operación",command = lambda:self.__generaOperacion()).grid(row = 1,
 			column = 0,pady = 5,padx = 5,sticky = "E")
+		Button(self.__botRightFrame,text = "Reiniciar",command = lambda:self.__reiniciar()).grid(row = 2,
+			column = 0,pady = 5,padx = 5,sticky = "E")
+
 
 	def __generaOperacion(self):
 		operadores = ["+","-","/","*","%","^"]
@@ -187,10 +208,13 @@ class Ventana():
 			TME = int(self.__TMEEntry.get())
 			proceso = Proceso(programador,operacion,TME,len(self.__procesos))
 			lenLotes = len(self.__lotes)
-			# Se verifica si el lote esta vacio
+
+			# Se verifica si el lote esta lleno
 			if lenLotes == 0 or self.__lotes[-1].lleno():
 				self.__lotes.append(Lote(lenLotes+1))
+			# Agrega el proceso al ultimo lote
 			self.__lotes[-1].agregar(proceso)
+			
 			self.__procesos.append(proceso)
 			data = [proceso.dameNoPrograma(),proceso.dameProgramador(),
 				proceso.dameOperacion(),proceso.dameTiempoEstimadoSegundos()]
@@ -202,6 +226,7 @@ class Ventana():
 				"Debes ingresar un número en \"Tiempo Maximo Estimado\""
 			)
 
+	""" Este Metodo no se utiliza, sera util despues """
 	def __crearProcesos(self,n):
 		operadores = ["+","-","/","*","%","^"]
 		for i in range(0,n,1):
@@ -211,7 +236,28 @@ class Ventana():
 
 	def __simular(self):
 		try:
-			pass
+			self.__vaciarTabla(self.__loteEjecucionTable)
+			loteEjecucion = 1
+			for lote in self.__lotes:
+				self.__lotesPendientesSTR.set(f"Lotes Pendientes: {len(self.__lotes) - loteEjecucion}")
+				loteEjecucion += 1
+				for proceso in lote.procesos():
+					data = [proceso.dameNoPrograma(),proceso.dameProgramador(),proceso.dameOperacion(),
+						proceso.dameTiempoEstimadoSegundos(),lote.dameNum()]
+					self.__aniadeTabla(self.__loteEjecucionTable,data)
+				
+				for proceso in lote.procesos():
+					TTE = 0
+					while TTE <= proceso.dameTiempoEstimadoSegundos():
+						self.__aniadeProcesoEjecucion(proceso,TTE)
+						self.__ventana.update()
+						TTE += 1
+						sleep(1)
+					data = [proceso.dameNoPrograma(),proceso.dameProgramador(),proceso.dameOperacion(),
+						proceso.resolver(),proceso.dameTiempoEstimadoSegundos(),lote.dameNum()]
+					self.__aniadeTabla(self.__procesosTerminadosTable,data)
+
+				self.__vaciarTabla(self.__loteEjecucionTable)
 		except IndexError as e:
 			mb.showerror(
 				"¡¡ERROR!!",
@@ -225,9 +271,27 @@ class Ventana():
 	def __aniadeTabla(self,tabla,data):
 		tabla.insert('',END,values = data)
 
+	def __aniadeProcesoEjecucion(self,proceso,TTE):
+		self.__peNombreSTR.set(f"Nombre: {proceso.dameProgramador()}")
+		self.__peOperacionSTR.set(f"Operación: {proceso.dameOperacion()}")
+		self.__peTMESTR.set(f"TME: {proceso.dameTiempoEstimadoSegundos()}")
+		self.__peTTESTR.set(f"TTE: {TTE}")
+		self.__peTRESTR.set(f"TRE: {proceso.dameTiempoEstimadoSegundos() - TTE}")
+		self.__peNoProgramaSTR.set(f"NoPrograma: {proceso.dameNoPrograma()}")
+
+	def __reiniciar(self):
+		self.__vaciarTabla(self.__todosProcesosTable)
+		self.__vaciarTabla(self.__loteEjecucionTable)
+		self.__vaciarTabla(self.__procesosTerminadosTable)
+		self.__procesos = []
+		self.__lotes = []
+		self.__noProgramaSTR.set("Número de Programa: 0")
+		self.__peNombreSTR.set("Nombre: ")
+		self.__peOperacionSTR.set("Operación: ")
+		self.__peTMESTR.set("TME: ")
+		self.__peTTESTR.set("TTE: ")
+		self.__peTRESTR.set("TRE: ")
+		self.__peNoProgramaSTR.set("NoPrograma: ")
+
 	def dibujar(self):
 		self.__ventana.mainloop()
-
-
-if __name__ == "__main__":
-	Ventana(Tk()).dibujar()
