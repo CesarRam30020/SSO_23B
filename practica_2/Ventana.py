@@ -278,6 +278,49 @@ class Ventana():
 				"Debes ingresar por lo menos 1 proceso"
 			)
 
+	def __simular(self):
+		try:
+			self.__vaciarTabla(self.__loteEjecucionTable)
+			loteEjecucion = 1
+			for lote in self.__lotes:
+				self.__lotesPendientesSTR.set(f"Lotes Pendientes: {len(self.__lotes) - loteEjecucion}")
+				loteEjecucion += 1
+				# agrega todos los procesos a la tabla del "Lote en Ejecucion"
+				for proceso in lote.procesos():
+					# Obtiene los datos del Proceso necesarios para agregarlos a la tabla "Lote en Ejecucion"
+					data = [proceso.dameNoPrograma(),proceso.dameProgramador(),proceso.dameOperacion(),
+						proceso.dameTiempoEstimadoSegundos(),lote.dameNum()]
+					# Agrega los datos a la tabla
+					self.__aniadeTabla(self.__loteEjecucionTable,data)
+				
+				for proceso in lote.procesos():
+					# Tiempo Total Ejecutado, comienza en cero por cada proceso que se ejecuta
+					TTE = 0
+					# Si el TTE es igual al tiempo estimado de ejecucion del proceso, termina el while
+					while TTE <= proceso.dameTiempoEstimadoSegundos():
+						# Añade los datos del proceso en ejecucion en el apartado de "Proceso en Ejecucion"
+						self.__aniadeProcesoEjecucion(proceso,TTE)
+						# Actualiza el contenido de la ventana
+						self.__ventana.update()
+						TTE += 1
+						# Mueve el reloj
+						self.__reloj()
+						sleep(1)
+					# Obtiene los datos del Proceso que se "acaba de ejecutar" para despues agregarlo a la table de "Procesos Terminados"
+					data = [proceso.dameNoPrograma(),proceso.dameProgramador(),proceso.dameOperacion(),
+						proceso.resolver(),proceso.dameTiempoEstimadoSegundos(),lote.dameNum()]
+					# Añade el proceso a la tabla de "Procesos Terminados"
+					self.__aniadeTabla(self.__procesosTerminadosTable,data)
+
+                # Una vez ya no haya mas procesos para ejecutar, vacia la tabla de "Lote en Ejecucion"
+				self.__vaciarTabla(self.__loteEjecucionTable)
+		except IndexError as e:
+			mb.showerror(
+				"¡¡ERROR!!",
+				"Debes ingresar por lo menos 1 proceso"
+			)
+
+
 	def __vaciarTabla(self,tabla):
 		for i in tabla.get_children():
 			tabla.delete(i)
