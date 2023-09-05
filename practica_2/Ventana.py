@@ -254,37 +254,6 @@ class Ventana():
 			for lote in self.__lotes:
 				self.__lotesPendientesSTR.set(f"Lotes Pendientes: {len(self.__lotes) - loteEjecucion}")
 				loteEjecucion += 1
-				for proceso in lote.procesos():
-					data = [proceso.dameNoPrograma(),proceso.dameProgramador(),proceso.dameOperacion(),
-						proceso.dameTiempoEstimadoSegundos(),lote.dameNum()]
-					self.__aniadeTabla(self.__loteEjecucionTable,data)
-				
-				for proceso in lote.procesos():
-					TTE = 0
-					while TTE <= proceso.dameTiempoEstimadoSegundos():
-						self.__aniadeProcesoEjecucion(proceso,TTE)
-						self.__ventana.update()
-						TTE += 1
-						self.__reloj()
-						sleep(1)
-					data = [proceso.dameNoPrograma(),proceso.dameProgramador(),proceso.dameOperacion(),
-						proceso.resolver(),proceso.dameTiempoEstimadoSegundos(),lote.dameNum()]
-					self.__aniadeTabla(self.__procesosTerminadosTable,data)
-
-				self.__vaciarTabla(self.__loteEjecucionTable)
-		except IndexError as e:
-			mb.showerror(
-				"¡¡ERROR!!",
-				"Debes ingresar por lo menos 1 proceso"
-			)
-
-	def __simular(self):
-		try:
-			self.__vaciarTabla(self.__loteEjecucionTable)
-			loteEjecucion = 1
-			for lote in self.__lotes:
-				self.__lotesPendientesSTR.set(f"Lotes Pendientes: {len(self.__lotes) - loteEjecucion}")
-				loteEjecucion += 1
 				# agrega todos los procesos a la tabla del "Lote en Ejecucion"
 				for proceso in lote.procesos():
 					# Obtiene los datos del Proceso necesarios para agregarlos a la tabla "Lote en Ejecucion"
