@@ -23,6 +23,9 @@ class Ventana():
 		self.__peTTESTR = StringVar()
 		self.__peTRESTR = StringVar()
 		self.__peNoProgramaSTR = StringVar()
+		self.__relojStr = StringVar()
+		self.__seg = 0
+		self.__min = 0
 
 		self.__noProgramaSTR.set("Número de Programa: 0")
 		self.__lotesPendientesSTR.set("Lotes Pendientes: 0")
@@ -32,6 +35,7 @@ class Ventana():
 		self.__peTTESTR.set("TTE: ")
 		self.__peTRESTR.set("TRE: ")
 		self.__peNoProgramaSTR.set("NoPrograma: ")
+		self.__relojStr.set("00:00")
 
 		""" Frames """
 		self.__topFrame = None
@@ -45,6 +49,7 @@ class Ventana():
 		self.__botFrame = None
 		self.__botLeftFrame = None
 		self.__botRightFrame = None
+		self.__relojFrame = None
 
 		""" Labels """
 		self.__noProgramaLabel = None
@@ -57,6 +62,8 @@ class Ventana():
 		self.__peTTELabel = None
 		self.__peTRELabel = None
 		self.__peNoProgramaLabel = None
+
+		self.__relojLabel = None
 
 		""" Entrys """
 		self.__programadorEntry = None
@@ -101,6 +108,9 @@ class Ventana():
 		self.__botRightFrame = Frame(self.__botFrame)
 		self.__botRightFrame.grid(row = 0,column = 1,pady = 5,padx = 5)
 
+		self.__relojFrame = Frame(self.__botFrame)
+		self.__relojFrame.grid(row = 1,column = 0,padx = 5, pady = 5)
+
 	def __initLabels(self):
 		""" TopFrameLables """
 		Label(self.__topLeftFrame,text = "Programador").grid(row = 0,column = 0,pady = 5,padx = 5,sticky = "E")
@@ -129,6 +139,9 @@ class Ventana():
 		self.__peNoProgramaLabel = Label(self.__botLeftFrame,textvariable = self.__peNoProgramaSTR)
 		self.__peNoProgramaLabel.grid(row = 6,column = 0,padx = 5,sticky = "W")
 		Label(self.__botRightFrame,text = "Procesos terminados").grid(row = 0,column = 0,pady = 5,padx = 5)
+
+		self.__relojLabel = Label(self.__relojFrame,textvariable = self.__relojStr)
+		self.__relojLabel.grid(row = 0,column = 0)
 
 	def __initEntrys(self):
 		self.__programadorEntry = Entry(self.__topLeftFrame)
@@ -252,6 +265,7 @@ class Ventana():
 						self.__aniadeProcesoEjecucion(proceso,TTE)
 						self.__ventana.update()
 						TTE += 1
+						self.__reloj()
 						sleep(1)
 					data = [proceso.dameNoPrograma(),proceso.dameProgramador(),proceso.dameOperacion(),
 						proceso.resolver(),proceso.dameTiempoEstimadoSegundos(),lote.dameNum()]
@@ -292,6 +306,22 @@ class Ventana():
 		self.__peTTESTR.set("TTE: ")
 		self.__peTRESTR.set("TRE: ")
 		self.__peNoProgramaSTR.set("NoPrograma: ")
+
+	def __reloj(self):
+		if self.__seg == 59:
+			self.__seg = 0
+			self.__min += 1
+		else:
+			pass
+
+		self.__seg += 1
+
+		horaImp = "0" if self.__min < 10 else ""
+		horaImp += str(self.__min)+":"
+		horaImp += "0" if self.__seg < 10 else ""
+		horaImp += str(self.__seg)
+
+		self.__relojStr.set(horaImp)
 
 	def dibujar(self):
 		self.__ventana.mainloop()
