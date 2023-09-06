@@ -10,11 +10,9 @@ class Ventana():
 		self.__ventana = ventana
 		self.__ventana.title(titulo)
 
-		self.__procesosLote = 4
 		self.__procesos = []
 		self.__lotes = []
 
-		self.__operacionSTR = StringVar()
 		self.__noProgramaSTR = StringVar()
 		self.__lotesPendientesSTR = StringVar()
 		self.__peNombreSTR = StringVar()
@@ -66,13 +64,7 @@ class Ventana():
 		self.__relojLabel = None
 
 		""" Entrys """
-		self.__programadorEntry = None
-		self.__operacionEntry = None
-		self.__TMEEntry = None
-
-		""" Buttons """
-		self.__agregarButton = None
-		self.__simulacionButton = None
+		self.__noProgramasEntry = None
 
 		""" Treeview (Tablas) """
 		self.__todosProcesosTable = None
@@ -113,11 +105,8 @@ class Ventana():
 
 	def __initLabels(self):
 		""" TopFrameLables """
-		Label(self.__topLeftFrame,text = "Programador").grid(row = 0,column = 0,pady = 5,padx = 5,sticky = "E")
-		Label(self.__topLeftFrame,text = "Tiempo Maximo Estimado").grid(row = 2,column = 0,pady = 5,
-			padx = 5,sticky = "E")
-		self.__noProgramaLabel = Label(self.__topLeftFrame,textvariable = self.__noProgramaSTR)
-		self.__noProgramaLabel.grid(row = 3,column = 0,pady = 5,padx = 5,sticky = "E")
+		self.__noProgramaLabel = Label(self.__topLeftFrame, text = "Numero de Programas")
+		self.__noProgramaLabel.grid(row = 0,column = 0)
 
 		""" MidFrameLables """
 		self.__lotesPendientesLabel = Label(self.__midLeftFrame,textvariable = self.__lotesPendientesSTR)
@@ -144,12 +133,8 @@ class Ventana():
 		self.__relojLabel.grid(row = 0,column = 0)
 
 	def __initEntrys(self):
-		self.__programadorEntry = Entry(self.__topLeftFrame)
-		self.__programadorEntry.grid(row = 0,column = 1,pady = 5,padx = 5)
-		self.__operacionEntry = Entry(self.__topLeftFrame,textvariable = self.__operacionSTR)
-		self.__operacionEntry.grid(row = 1,column = 1,pady = 5,padx = 5)
-		self.__TMEEntry = Entry(self.__topLeftFrame)
-		self.__TMEEntry.grid(row = 2,column = 1,pady = 5,padx = 5)
+		self.__noProgramasEntry = Entry(self.__topLeftFrame)
+		self.__noProgramasEntry.grid(row = 0,column = 1)
 
 	def __initTreeviews(self):
 		self.__todosProcesosTable = Treeview(self.__topRightFrame,
@@ -198,54 +183,43 @@ class Ventana():
 		self.__procesosTerminadosTable.heading("Lote",text = "Lote")
 		
 	def __initButtons(self):
-		self.__agregarButton = Button(self.__topLeftFrame,text = "Agregar",command = lambda:self.__agregarProceso())
-		self.__agregarButton.grid(row = 3,column = 1,pady = 5,padx = 5)
-		self.__simulacionButton = Button(self.__midLeftFrame,text = "Comienza Eimulación",
-			command = lambda:self.__simular())
-		self.__simulacionButton.grid(row = 1,column = 0,pady = 5,padx = 5)
-		Button(self.__topLeftFrame,text = "Operación",command = lambda:self.__generaOperacion()).grid(row = 1,
-			column = 0,pady = 5,padx = 5,sticky = "E")
+		Button(self.__topLeftFrame,text = "Agregar",command = lambda:self.__crearProcesos(self.__noProgramasEntry.get())).grid(row = 3,column = 1,pady = 5,padx = 5)
+		Button(self.__midLeftFrame,text = "Comienza Eimulación",command = lambda:self.__simular()).grid(row = 1,column = 0,pady = 5,padx = 5)
 		Button(self.__botRightFrame,text = "Reiniciar",command = lambda:self.__reiniciar()).grid(row = 2,
 			column = 0,pady = 5,padx = 5,sticky = "E")
 
-
-	def __generaOperacion(self):
-		operadores = ["+","-","/","*","%","^"]
-		operacion = str(randint(0,100)) + operadores[randint(0,5)] + str(randint(0,100))
-		self.__operacionSTR.set(operacion)
-
-	def __agregarProceso(self):
+	def __crearProcesos(self,n: str):
 		try:
-			programador = self.__programadorEntry.get()
-			operacion = self.__operacionEntry.get()
-			TME = int(self.__TMEEntry.get())
-			proceso = Proceso(programador,operacion,TME,len(self.__procesos))
-			lenLotes = len(self.__lotes)
-
-			# Se verifica si el lote esta lleno
-			if lenLotes == 0 or self.__lotes[-1].lleno():
-				self.__lotes.append(Lote(lenLotes+1))
-			# Agrega el proceso al ultimo lote
-			self.__lotes[-1].agregar(proceso)
-			
-			self.__procesos.append(proceso)
-			data = [proceso.dameNoPrograma(),proceso.dameProgramador(),
-				proceso.dameOperacion(),proceso.dameTiempoEstimadoSegundos()]
-			self.__aniadeTabla(self.__todosProcesosTable,data)
-			self.__noProgramaSTR.set(f"Número de Programa: {len(self.__procesos)}")
+			# Vacia la lista de procesos
+			self.__procesos = []
+			# Vacia la tabla de "Todos los Procesos"
+			self.__vaciarTabla(self.__todosProcesosTable)
+			# Convierte a "n" en un entero (Se hizo la conversion aquí para evitar errores en tiempo de ejecucion)
+			n = int(n)
+			# Lista de Operadres validos
+			operadores = ["+","-","/","*","%","^"]
+			for i in range(0,n,1):
+				# Genera una operacion aleatoria, ejemplo: "25 ^ 2"
+				operacion = str(randint(0,100)) + operadores[randint(0,5)] + str(randint(0,100))
+				# Crea el proceso con los datos validos
+				proceso = Proceso("C&E",operacion,randint(7,18),i)
+				lenLotes = len(self.__lotes)
+				# Se verifica si el lote esta lleno
+				if lenLotes == 0 or self.__lotes[-1].lleno():
+					self.__lotes.append(Lote(lenLotes+1))
+				# Agrega el proceso al ultimo lote
+				self.__lotes[-1].agregar(proceso)
+				# Agrega el proceso a la lista de procesos
+				self.__procesos.append(proceso)
+				# Obtenemos los datos para agregarlo a la tabla de "Todos los Procesos"
+				data = [proceso.dameNoPrograma(),proceso.dameProgramador(),proceso.dameOperacion(),proceso.dameTiempoEstimadoSegundos()]
+				# Añadimos los datos a la tabla
+				self.__aniadeTabla(self.__todosProcesosTable,data)
 		except ValueError as e:
 			mb.showerror(
 				"¡¡ERROR!!",
-				"Debes ingresar un número en \"Tiempo Maximo Estimado\""
+				"Debes ingresar un número en \"Numero de Programas\""
 			)
-
-	""" Este Metodo no se utiliza, sera util despues """
-	def __crearProcesos(self,n):
-		operadores = ["+","-","/","*","%","^"]
-		for i in range(0,n,1):
-			operacion = str(randint(0,100)) + operadores[randint(0,5)] + str(randint(0,100))
-			proceso = Proceso(i,operacion,randint(1,20))
-			self.__procesosList.append(proceso)
 
 	def __simular(self):
 		try:
@@ -318,6 +292,8 @@ class Ventana():
 		self.__peTTESTR.set("TTE: ")
 		self.__peTRESTR.set("TRE: ")
 		self.__peNoProgramaSTR.set("NoPrograma: ")
+		self.__relojStr.set("00:00")
+		self.__min = self.__seg = 0
 
 	def __reloj(self):
 		if self.__seg == 59:
