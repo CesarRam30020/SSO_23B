@@ -10,8 +10,8 @@ class Ventana():
 		self.__ventana = ventana
 		self.__ventana.title(titulo)
 
-		self.__procesos = []
-		self.__lotes = []
+		self.__procesos: list = []
+		self.__lotes: list = []
 
 		self.__noProgramaSTR = StringVar()
 		self.__lotesPendientesSTR = StringVar()
@@ -22,8 +22,8 @@ class Ventana():
 		self.__peTRESTR = StringVar()
 		self.__peNoProgramaSTR = StringVar()
 		self.__relojStr = StringVar()
-		self.__seg = 0
-		self.__min = 0
+		self.__seg: int = 0
+		self.__min: int = 0
 
 		self.__noProgramaSTR.set("Número de Programa: 0")
 		self.__lotesPendientesSTR.set("Lotes Pendientes: 0")
