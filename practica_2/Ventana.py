@@ -5,13 +5,23 @@ from Lote import Proceso,Lote
 from random import randint
 from time import sleep
 
+TECLA_INTERRUPCION = "i"
+TECLA_ERROR = "e"
+TECLA_CONTINUAR = "c"
+TECLA_PAUSAR = "p"
+
 class Ventana():
 	def __init__(self,ventana,titulo = "Emulador de Procesamiento por Lotes"):
 		self.__ventana = ventana
 		self.__ventana.title(titulo)
+		self._loteTemporal = Lote()
+		self._procesoTemporal = Proceso()
 
 		self.__procesos: list = []
 		self.__lotes: list = []
+		self._tecla_estado = ""
+		self._interrupcionProceso = ""
+		self._procesosPendientes = False
 
 		self.__noProgramaSTR = StringVar()
 		self.__lotesPendientesSTR = StringVar()
@@ -184,9 +194,9 @@ class Ventana():
 		
 	def __initButtons(self):
 		Button(self.__topLeftFrame,text = "Agregar",command = lambda:self.__crearProcesos(self.__noProgramasEntry.get())).grid(row = 3,column = 1,pady = 5,padx = 5)
-		Button(self.__midLeftFrame,text = "Comienza Eimulación",command = lambda:self.__simular()).grid(row = 1,column = 0,pady = 5,padx = 5)
-		Button(self.__botRightFrame,text = "Reiniciar",command = lambda:self.__reiniciar()).grid(row = 2,
-			column = 0,pady = 5,padx = 5,sticky = "E")
+		Button(self.__midLeftFrame,text = "Comienza Emulación",command = lambda:self.__simular_2()).grid(row = 1,column = 0,pady = 5,padx = 5)
+		#Button(self.__midLeftFrame,text = "Comienza Emulación",command = lambda:self.__simular()).grid(row = 1,column = 0,pady = 5,padx = 5)
+		Button(self.__botRightFrame,text = "Reiniciar",command = lambda:self.__reiniciar()).grid(row = 2, column = 0,pady = 5,padx = 5,sticky = "E")
 
 	def __crearProcesos(self,n: str):
 		try:
@@ -249,6 +259,7 @@ class Ventana():
 						# Mueve el reloj
 						self.__reloj()
 						sleep(1)
+						print("tst")
 					# Obtiene los datos del Proceso que se "acaba de ejecutar" para despues agregarlo a la table de "Procesos Terminados"
 					data = [proceso.dameNoPrograma(),proceso.dameProgramador(),proceso.dameOperacion(),
 						proceso.resolver(),proceso.dameTiempoEstimadoSegundos(),lote.dameNum()]
@@ -263,6 +274,34 @@ class Ventana():
 				"Debes ingresar por lo menos 1 proceso"
 			)
 
+	def __simular_2(self):
+		self.__vaciarTabla(self.__loteEjecucionTable)
+		self._tecla_estado = "c"
+		'''
+		try:
+			self.__vaciarTabla(self.__loteEjecucionTable)
+			loteEjecucion = 1
+			print(self.__lotes)
+
+			while True:
+				if self._tecla_estado == TECLA_CONTINUAR:
+					if len(self.__lotes) == 0:
+						print("No more lotes")
+						break
+					else:
+						self.__lotes.pop(0)
+						print(self.__lotes)
+				elif self._tecla_estado == TECLA_PAUSAR:
+					pass
+				else:
+					pass
+			
+		except IndexError as e:
+			mb.showerror(
+				"¡¡ERROR!!",
+				"Debes ingresar por lo menos 1 proceso"
+			)
+		'''
 
 	def __vaciarTabla(self,tabla):
 		for i in tabla.get_children():
@@ -311,5 +350,100 @@ class Ventana():
 
 		self.__relojStr.set(horaImp)
 
+	def __manejadorInterrupciones(self) -> None:
+		self._tecla_estado = TECLA_CONTINUAR
+		self._interrupcionProceso = ""
+
+
+	
+	def __obtenerLote(self) -> None:
+		if len(self.__lotes) != 0:
+
+			self._loteTemporal = self.__lotes[0]
+			self.__lotes.pop(0)
+			self._procesosPendientes = True
+
+			print("Lote Num:", self._loteTemporal._num)
+			print("Procesos:", self._loteTemporal._procesos)
+			print("Procesos Maximos:", self._loteTemporal._maxProcesos)
+			
+			'''
+			if self._interrupcionProceso == TECLA_ERROR:
+				print("Proceso terminado por error:", self._interrupcionProceso)
+				self.__manejadorInterrupciones()
+				
+			elif self._interrupcionProceso == TECLA_INTERRUPCION:
+				print("Proceso interrumpido:", self._interrupcionProceso)
+				self.__manejadorInterrupciones()
+			'''
+		else:
+			pass
+	
+	def __obtenerProceso(self) -> None:
+		if len(self._loteTemporal._procesos) != 0:
+			self._procesoTemporal = self._loteTemporal._procesos[0]
+			self._loteTemporal._procesos.pop(0)
+			
+			print("Programador", self._procesoTemporal.dameProgramador())
+			print("Programador", self._procesoTemporal.dameOperacion())
+			print("Programador", self._procesoTemporal.dameTiempoEstimadoSegundos())
+			print("Programador", self._procesoTemporal.dameNoPrograma())
+
+			if self._interrupcionProceso == TECLA_INTERRUPCION:
+				print("Tecla Interrupcion")
+				self._interrupcionProceso = ""
+			
+			if self._interrupcionProceso == TECLA_ERROR:
+				print("Tecla Error")
+				self._interrupcionProceso = ""
+
+			
+		else:
+			self._procesosPendientes = False
+			pass
+
+	def __validarEstadoTeclaPrograma(self) -> None:
+		try:
+			if self._tecla_estado == TECLA_CONTINUAR:
+				if self._procesosPendientes:
+					if self._tecla_estado == TECLA_INTERRUPCION:
+						self._interrupcionProceso = "i"
+					elif self._tecla_estado == TECLA_ERROR:
+						self._interrupcionProceso = "e"
+					else:
+						
+						self.__obtenerProceso()
+					
+				else:
+					self.__obtenerLote()
+			else:
+				if self._tecla_estado == TECLA_PAUSAR:
+					pass
+			
+		except Exception as e:
+			pass
+		finally:
+			self.__ventana.after(250, self.__validarEstadoTeclaPrograma)
+	
+	def key_press(self, event) -> None:
+		print(event)
+
+		if event.keysym == TECLA_CONTINUAR:
+			self._tecla_estado = TECLA_CONTINUAR
+			# print("Key press:", self._tecla_estado)
+		elif event.keysym == TECLA_PAUSAR:
+			self._tecla_estado = TECLA_PAUSAR
+			# print("Key press:", self._tecla_estado)
+		elif event.keysym == TECLA_INTERRUPCION:
+			self._interrupcionProceso = TECLA_INTERRUPCION
+		elif event.keysym == TECLA_ERROR:
+			self._interrupcionProceso = TECLA_ERROR
+		else:
+			# print("Error")
+			pass
+
+
 	def dibujar(self):
+		self.__ventana.bind("<KeyPress>", self.key_press)
+		self.__ventana.after(100, self.__validarEstadoTeclaPrograma)
 		self.__ventana.mainloop()

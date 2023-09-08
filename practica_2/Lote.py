@@ -42,7 +42,9 @@ class Lote():
 
 
 class Proceso():
-	def __init__(self,programador,operacion,tiempoMaximoEstimado,noPrograma) -> None:
+	def __init__(self,programador="", operacion="0/0", 
+				tiempoMaximoEstimado=TIEMPO_ESTIMADO_SEGUNDOS_INICIAL,
+				noPrograma=NO_PROGRAMA_INICIAL) -> None:
 		self.__programador = ""
 		self._operacion = "0/0"
 		self._tiempoEstimadoSegundos = TIEMPO_ESTIMADO_SEGUNDOS_INICIAL
