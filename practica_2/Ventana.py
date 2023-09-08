@@ -362,6 +362,17 @@ class Ventana():
 
 			self._loteTemporal = self.__lotes[0]
 			self.__lotes.pop(0)
+			for proceso in self._loteTemporal._procesos:
+				data = [
+					proceso.dameNoPrograma(),
+					proceso.dameProgramador(),
+					proceso.dameOperacion(),
+					proceso.dameTiempoEstimadoSegundos(),
+					self._loteTemporal.dameNum()
+				]
+				self.__aniadeTabla(self.__loteEjecucionTable, data)
+				print(data)
+			self.__ventana.update()
 			self._procesosPendientes = True
 		else:
 			self.__lotesPendientesSTR.set("Lotes Pendientes: 0")
@@ -376,6 +387,7 @@ class Ventana():
 			self._tre = self._procesoTemporal.dameTiempoEstimadoSegundos()
 			self._procesoCompleto = int(self._procesoTemporal.dameTiempoEstimadoSegundos()) - 1
 
+			'''
 			data = [self._procesoTemporal.dameNoPrograma(),
 					self._procesoTemporal.dameProgramador(),
 					self._procesoTemporal.dameOperacion(),
@@ -383,6 +395,7 @@ class Ventana():
 					self._loteTemporal.dameNum()]
 
 			self.__aniadeTabla(self.__loteEjecucionTable,data)
+			'''
 			
 		else:
 			self._procesosPendientes = False
@@ -421,6 +434,15 @@ class Ventana():
 	def __reintegracionProcesoInterrumpido(self) -> None:
 		self._procesoTemporal._tiempoEstimadoSegundos = self._tre
 		self._loteTemporal._procesos.append(self._procesoTemporal)
+		data = [
+			self._procesoTemporal.dameNoPrograma(),
+			self._procesoTemporal.dameProgramador(),
+			self._procesoTemporal.dameOperacion(),
+			self._procesoTemporal.dameTiempoEstimadoSegundos(),
+			self._loteTemporal.dameNum()
+		]
+		self.__aniadeTabla(self.__loteEjecucionTable, data)
+		self.__ventana.update()
 
 	def __ejecutarProceso(self) -> None:
 		
@@ -441,6 +463,7 @@ class Ventana():
 	def __validarEstadoTeclaPrograma(self) -> None:
 		try:
 			if self._tecla_estado == TECLA_CONTINUAR:
+				print("Programa corriendo")
 				if self._procesosPendientes:
 					if self._tecla_estado == TECLA_INTERRUPCION:
 						self._interrupcionProceso = "i"
@@ -457,6 +480,7 @@ class Ventana():
 					self.__obtenerLote()
 			else:
 				if self._tecla_estado == TECLA_PAUSAR:
+					print("Programa pausado")
 					pass
 			
 		except Exception as e:
