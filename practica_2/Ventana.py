@@ -355,27 +355,6 @@ class Ventana():
 
 		self.__relojStr.set(horaImp)
 
-	def __reinicioInterrupcionProceso(self) -> None:
-		self._interrupcionProceso = ""
-	
-	def __verificacionInterrupciones(self) -> None:
-		if self._interrupcionProceso == TECLA_INTERRUPCION:
-				print("Tecla Interrupcion")
-				self.__reinicioInterrupcionProceso()
-				if len(self._loteTemporal._procesos) < 3:
-					self._loteTemporal._procesos.append(self._procesoTemporal)
-					data = [self._procesoTemporal.dameNoPrograma(),
-							self._procesoTemporal.dameProgramador(),
-							self._procesoTemporal.dameOperacion(),
-							self._tre,
-							self._loteTemporal.dameNum()]
-					self.__aniadeTabla(self.__loteEjecucionTable, data)
-					
-			
-		if self._interrupcionProceso == TECLA_ERROR:
-			print("Tecla Error")
-			self.__reinicioInterrupcionProceso()
-
 	def __obtenerLote(self) -> None:
 		if len(self.__lotes) != 0:
 			self.__lotesPendientesSTR.set(f"Lotes Pendientes: {len(self.__lotes) - self._loteEjecucion}")
@@ -404,47 +383,73 @@ class Ventana():
 					self._loteTemporal.dameNum()]
 
 			self.__aniadeTabla(self.__loteEjecucionTable,data)
-
-			self.__verificacionInterrupciones()
 			
 		else:
 			self._procesosPendientes = False
 			pass
 	
+	def __actualizarVistaProceso(self) -> None:
+		if self._tte <= self._procesoTemporal.dameTiempoEstimadoSegundos():
+			self.__aniadeProcesoEjecucion(self._procesoTemporal,self._tte)
+			self.__ventana.update()
+			self._tte += 1
+			self._tre -= 1
+			self.__reloj()
+	
+	def __actualizarVistaProcesoTerminado(self) -> None:
+		if self._interrupcionProceso == TECLA_ERROR:
+			resultado = "ERROR"
+		else:
+			resultado = self._procesoTemporal.resolver()
+
+		data = [
+			self._procesoTemporal.dameNoPrograma(),
+			self._procesoTemporal.dameProgramador(),
+			self._procesoTemporal.dameOperacion(),
+			resultado,
+			self._procesoTemporal.dameTiempoEstimadoSegundos(),
+			self._loteTemporal.dameNum()
+		]
+		self.__aniadeTabla(self.__procesosTerminadosTable, data)
+		self._procesoEnEjecucion = False
+		self._tte = 0
+	
+	def __reinicioInterrupcionProceso(self) -> None:
+		self._interrupcionProceso = ""
+	
+	def __verificacionInterrupciones(self) -> None:
+		if self._interrupcionProceso == TECLA_INTERRUPCION:
+			print("Tecla Interrupcion")
+			self.__reinicioInterrupcionProceso()
+			if len(self._loteTemporal._procesos) < 3:
+				self._loteTemporal._procesos.append(self._procesoTemporal)
+				data = [self._procesoTemporal.dameNoPrograma(),
+						self._procesoTemporal.dameProgramador(),
+						self._procesoTemporal.dameOperacion(),
+						self._tre,
+						self._loteTemporal.dameNum()]
+				self.__aniadeTabla(self.__loteEjecucionTable, data)
+	
+	def __reintegracionProcesoInterrumpido(self) -> None:
+		self._procesoTemporal._tiempoEstimadoSegundos = self._tre
+		self._loteTemporal._procesos.append(self._procesoTemporal)
+
 	def __ejecutarProceso(self) -> None:
 		
 		# print(self._tte, type(self._tte))
 		# print(procesoCompleto, type((procesoCompleto)))
 		# print(self._tte != procesoCompleto)
 		if self._tte != self._procesoCompleto:
-			
-			if self._tte <= self._procesoTemporal.dameTiempoEstimadoSegundos():
-				self.__aniadeProcesoEjecucion(self._procesoTemporal,self._tte)
-				self.__ventana.update()
-				self._tte += 1
-				self._tre -= 1
-				self.__reloj()
-
+			self.__actualizarVistaProceso()
 			if self._interrupcionProceso == TECLA_ERROR:
 				self._tte = self._procesoCompleto
+				self.__reinicioInterrupcionProceso()
+			if self._interrupcionProceso == TECLA_INTERRUPCION:
+				self.__reintegracionProcesoInterrumpido()
+				self.__reinicioInterrupcionProceso()
+				self._procesoEnEjecucion = False
 		else:
-			if self._interrupcionProceso == TECLA_ERROR:
-				resultado = "ERROR"
-			else:
-				resultado = self._procesoTemporal.resolver()
-
-			data = [
-				self._procesoTemporal.dameNoPrograma(),
-				self._procesoTemporal.dameProgramador(),
-				self._procesoTemporal.dameOperacion(),
-				resultado,
-				self._procesoTemporal.dameTiempoEstimadoSegundos(),
-				self._loteTemporal.dameNum()
-			]
-			self.__aniadeTabla(self.__procesosTerminadosTable, data)
-			self._procesoEnEjecucion = False
-			self._tte = 0
-
+			self.__actualizarVistaProcesoTerminado()
 
 	def __validarEstadoTeclaPrograma(self) -> None:
 		try:
@@ -470,7 +475,7 @@ class Ventana():
 		except Exception as e:
 			pass
 		finally:
-			self.__ventana.after(1000, self.__validarEstadoTeclaPrograma)
+			self.__ventana.after(250, self.__validarEstadoTeclaPrograma)
 	
 	def key_press(self, event) -> None:
 		print(event)
