@@ -30,6 +30,10 @@ class Lote():
 
 	def lleno(self) -> bool:
 		return len(self._procesos) >= self._maxProcesos
+	
+	def mueveProcesos(self):
+		self._procesos.append(self.__procesos[0])
+		self._procesos.pop(0)
 
 	def __str__(self) -> str:
 		s = "Numero de Lote: "+str(self._num)+"\n"
