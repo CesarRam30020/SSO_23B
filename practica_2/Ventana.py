@@ -279,6 +279,7 @@ class Ventana():
 			)
 
 	def __simular_2(self):
+		self.__vaciarTabla(self.__todosProcesosTable)
 		self.__vaciarTabla(self.__loteEjecucionTable)
 		self._tecla_estado = "c"
 		'''
@@ -425,12 +426,12 @@ class Ventana():
 				self.__reloj()
 
 			if self._interrupcionProceso == TECLA_ERROR:
-				resultado = "ERROR"
-				self._tte = 0
+				self._tte = self._procesoCompleto
 		else:
-			resultado = self._procesoTemporal.resolver()
-			print(resultado)
-			print("Proceso Terminado A...")
+			if self._interrupcionProceso == TECLA_ERROR:
+				resultado = "ERROR"
+			else:
+				resultado = self._procesoTemporal.resolver()
 
 			data = [
 				self._procesoTemporal.dameNoPrograma(),
@@ -440,24 +441,9 @@ class Ventana():
 				self._procesoTemporal.dameTiempoEstimadoSegundos(),
 				self._loteTemporal.dameNum()
 			]
-
 			self.__aniadeTabla(self.__procesosTerminadosTable, data)
-
-			'''
-			data = [self._procesoTemporal.dameNoPrograma(),
-					self._procesoTemporal.dameProgramador(),
-					self._procesoTemporal.dameOperacion(),
-					resultado,
-					self._procesoTemporal.dameTiempoEstimadoSegundos(),
-					self._loteTemporal.dameNum()]
-			print("Proceso Terminado... C")
-			self.__aniadeTabla(self.__procesosTerminadosTable, data)
-			print("Proceso Terminado... D")
-			'''
 			self._procesoEnEjecucion = False
-			print("Proceso Terminado... F")
 			self._tte = 0
-			print("Proceso Terminado B...")
 
 
 	def __validarEstadoTeclaPrograma(self) -> None:
@@ -484,7 +470,7 @@ class Ventana():
 		except Exception as e:
 			pass
 		finally:
-			self.__ventana.after(100, self.__validarEstadoTeclaPrograma)
+			self.__ventana.after(1000, self.__validarEstadoTeclaPrograma)
 	
 	def key_press(self, event) -> None:
 		print(event)
