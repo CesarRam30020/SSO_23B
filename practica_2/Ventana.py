@@ -5,6 +5,8 @@ from Lote import Proceso,Lote
 from random import randint
 from time import sleep
 
+TECLA_OPERACION = ""
+
 class Ventana():
 	def __init__(self,ventana,titulo = "Emulador de Procesamiento por Lotes"):
 		self.__ventana = ventana
@@ -184,9 +186,9 @@ class Ventana():
 		
 	def __initButtons(self):
 		Button(self.__topLeftFrame,text = "Agregar",command = lambda:self.__crearProcesos(self.__noProgramasEntry.get())).grid(row = 3,column = 1,pady = 5,padx = 5)
-		Button(self.__midLeftFrame,text = "Comienza Eimulación",command = lambda:self.__simular()).grid(row = 1,column = 0,pady = 5,padx = 5)
-		Button(self.__botRightFrame,text = "Reiniciar",command = lambda:self.__reiniciar()).grid(row = 2,
-			column = 0,pady = 5,padx = 5,sticky = "E")
+		Button(self.__midLeftFrame,text = "Comienza Emulación",command = lambda:self.__simular_2()).grid(row = 1,column = 0,pady = 5,padx = 5)
+		#Button(self.__midLeftFrame,text = "Comienza Emulación",command = lambda:self.__simular()).grid(row = 1,column = 0,pady = 5,padx = 5)
+		Button(self.__botRightFrame,text = "Reiniciar",command = lambda:self.__reiniciar()).grid(row = 2, column = 0,pady = 5,padx = 5,sticky = "E")
 
 	def __crearProcesos(self,n: str):
 		try:
@@ -225,6 +227,7 @@ class Ventana():
 		try:
 			self.__vaciarTabla(self.__loteEjecucionTable)
 			loteEjecucion = 1
+			print(self.__lotes)
 			for lote in self.__lotes:
 				self.__lotesPendientesSTR.set(f"Lotes Pendientes: {len(self.__lotes) - loteEjecucion}")
 				loteEjecucion += 1
@@ -249,6 +252,7 @@ class Ventana():
 						# Mueve el reloj
 						self.__reloj()
 						sleep(1)
+						print("tst")
 					# Obtiene los datos del Proceso que se "acaba de ejecutar" para despues agregarlo a la table de "Procesos Terminados"
 					data = [proceso.dameNoPrograma(),proceso.dameProgramador(),proceso.dameOperacion(),
 						proceso.resolver(),proceso.dameTiempoEstimadoSegundos(),lote.dameNum()]
@@ -263,6 +267,25 @@ class Ventana():
 				"Debes ingresar por lo menos 1 proceso"
 			)
 
+	def __simular_2(self):
+		try:
+			self.__vaciarTabla(self.__loteEjecucionTable)
+			loteEjecucion = 1
+			print(self.__lotes)
+
+			while True:
+				if len(self.__lotes) == 0:
+					print("No more lotes")
+					break
+				else:
+					self.__lotes.pop(0)
+					print(self.__lotes)
+			
+		except IndexError as e:
+			mb.showerror(
+				"¡¡ERROR!!",
+				"Debes ingresar por lo menos 1 proceso"
+			)
 
 	def __vaciarTabla(self,tabla):
 		for i in tabla.get_children():
@@ -312,4 +335,5 @@ class Ventana():
 		self.__relojStr.set(horaImp)
 
 	def dibujar(self):
+		
 		self.__ventana.mainloop()
