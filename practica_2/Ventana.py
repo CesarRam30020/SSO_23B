@@ -398,6 +398,7 @@ class Ventana():
 	
 	def __actualizarVistaProcesoTerminado(self) -> None:
 		if self._interrupcionProceso == TECLA_ERROR:
+			self.__reinicioInterrupcionProceso()
 			resultado = "ERROR"
 		else:
 			resultado = self._procesoTemporal.resolver()
@@ -417,19 +418,6 @@ class Ventana():
 	def __reinicioInterrupcionProceso(self) -> None:
 		self._interrupcionProceso = ""
 	
-	def __verificacionInterrupciones(self) -> None:
-		if self._interrupcionProceso == TECLA_INTERRUPCION:
-			print("Tecla Interrupcion")
-			self.__reinicioInterrupcionProceso()
-			if len(self._loteTemporal._procesos) < 3:
-				self._loteTemporal._procesos.append(self._procesoTemporal)
-				data = [self._procesoTemporal.dameNoPrograma(),
-						self._procesoTemporal.dameProgramador(),
-						self._procesoTemporal.dameOperacion(),
-						self._tre,
-						self._loteTemporal.dameNum()]
-				self.__aniadeTabla(self.__loteEjecucionTable, data)
-	
 	def __reintegracionProcesoInterrumpido(self) -> None:
 		self._procesoTemporal._tiempoEstimadoSegundos = self._tre
 		self._loteTemporal._procesos.append(self._procesoTemporal)
@@ -443,7 +431,6 @@ class Ventana():
 			self.__actualizarVistaProceso()
 			if self._interrupcionProceso == TECLA_ERROR:
 				self._tte = self._procesoCompleto
-				self.__reinicioInterrupcionProceso()
 			if self._interrupcionProceso == TECLA_INTERRUPCION:
 				self.__reintegracionProcesoInterrumpido()
 				self.__reinicioInterrupcionProceso()
@@ -475,11 +462,9 @@ class Ventana():
 		except Exception as e:
 			pass
 		finally:
-			self.__ventana.after(250, self.__validarEstadoTeclaPrograma)
+			self.__ventana.after(950, self.__validarEstadoTeclaPrograma)
 	
 	def key_press(self, event) -> None:
-		print(event)
-
 		if event.keysym == TECLA_CONTINUAR:
 			self._tecla_estado = TECLA_CONTINUAR
 			# print("Key press:", self._tecla_estado)
