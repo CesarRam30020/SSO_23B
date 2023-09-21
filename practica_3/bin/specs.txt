@@ -1,0 +1,7 @@
+Python version: 3.9.10
+
+Install packages:
+    pip install PyQt5
+
+UI package (commando for execute: designer):
+    pip install PyQt5Designer
