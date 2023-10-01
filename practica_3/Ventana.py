@@ -237,6 +237,12 @@ class Ventana():
 				
 				# Actualiza el tiempo bloqueado
 				if len(self.__procesosBloqueadosList) > 0 and not bloq:
+					self.__peNombreSTR.set("Nombre: ")
+					self.__peOperacionSTR.set("Operación: ")
+					self.__peTMESTR.set("TME: ")
+					self.__peTTESTR.set("TTE: ")
+					self.__peTRESTR.set("TRE: ")
+					self.__peNoProgramaSTR.set("NoPrograma: ")
 					for proceso in self.__procesosBloqueadosList:
 						if relojAnt != self.__relojStr.get():
 							proceso.fijaTiempoBloqueado(proceso.dameTiempoBloqueado() - 1)
@@ -347,12 +353,12 @@ class Ventana():
 			self.__procesosListosList.append(self.__procesosNuevosList.pop(0))
 
 	def __actualizaProcesosBloqueados(self):
-		self.__peNombreSTR.set("Nombre: ")
-		self.__peOperacionSTR.set("Operación: ")
-		self.__peTMESTR.set("TME: ")
-		self.__peTTESTR.set("TTE: ")
-		self.__peTRESTR.set("TRE: ")
-		self.__peNoProgramaSTR.set("NoPrograma: ")
+		# self.__peNombreSTR.set("Nombre: ")
+		# self.__peOperacionSTR.set("Operación: ")
+		# self.__peTMESTR.set("TME: ")
+		# self.__peTTESTR.set("TTE: ")
+		# self.__peTRESTR.set("TRE: ")
+		# self.__peNoProgramaSTR.set("NoPrograma: ")
 
 		for i in range(0,3,1):
 			self.__procesosBloqueadosSTR[i].set("")
