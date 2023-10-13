@@ -20,6 +20,7 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
     Queue<Proceso> colaNuevos;
     Queue<Proceso> colaListos;
     Queue<Proceso> colaBloqueados;
+    Queue<Proceso> procesosTerminados; // Se pretende utilizar para mostrar BCP
     private static Timer timerAnimation;
     private int contadorGlobal = 0;
     private int numProcesosPendientes = 0;
@@ -42,6 +43,7 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
         tblColaBloqueados.getColumnModel().getColumn(0).setPreferredWidth(5);
         colaListos = new LinkedList<>();
         colaBloqueados = new LinkedList<>();
+        procesosTerminados = new LinkedList<>();
     }
 
     public void inicializarPrograma(Queue<Proceso> listaProceso) {
@@ -81,11 +83,14 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
     public void agregarProceso() {
         char[] OPERACIONES = {'+', '-', '*', '/', '%'};
         Proceso p = new Proceso();
-        
-        Proceso[] lista = colaNuevos.toArray(new Proceso[colaNuevos.size()]);
-        System.out.println("Ultimo ID: "+lista[lista.length - 1].obtenerID());
-        
-        p.establecerID(lista[lista.length - 1].obtenerID() + 1);
+        /** 
+         * Crea una lista de los proceso que haya en la cola, obtiene el ultimo
+         * de estos y de este, saca su ID y le suma 1, con esto conseguimos que
+         * los ID's no se repitan
+         */
+        int nextID = colaNuevos.toArray(new Proceso[colaNuevos.size()])
+            [colaNuevos.size() - 1].obtenerID() + 1;
+        p.establecerID(nextID);
         p.establecerDato1(new Random().nextInt(100) + 1);
         p.establecerDato2(new Random().nextInt(100) + 1);
         p.establecerOperacion(OPERACIONES[new Random().nextInt(5)]);
@@ -125,6 +130,13 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
         } else {
             model.addRow(new Object[]{p.obtenerID(), p.obtenerDato1() + " " + p.obtenerOperacion() + " " + p.obtenerDato2(), p.obtenerResultado()});
         }
+        
+        /**
+         * Al momento de que se termine de ejecutar un proceso, este se añade a
+         * la cola de terminados, esto para que no se pierdan y se pueda
+         * realizar la accion de la letra B.
+         */
+        procesosTerminados.add(p);
     }
 
     public void iniciarSimulacion() {
