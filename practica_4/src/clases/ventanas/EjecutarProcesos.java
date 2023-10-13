@@ -81,7 +81,11 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
     public void agregarProceso() {
         char[] OPERACIONES = {'+', '-', '*', '/', '%'};
         Proceso p = new Proceso();
-        p.establecerID(numProcesosPendientes + 1);
+        
+        Proceso[] lista = colaNuevos.toArray(new Proceso[colaNuevos.size()]);
+        System.out.println("Ultimo ID: "+lista[lista.length - 1].obtenerID());
+        
+        p.establecerID(lista[lista.length - 1].obtenerID() + 1);
         p.establecerDato1(new Random().nextInt(100) + 1);
         p.establecerDato2(new Random().nextInt(100) + 1);
         p.establecerOperacion(OPERACIONES[new Random().nextInt(5)]);
@@ -656,6 +660,10 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
                 actualizarColaListos(colaListos);
                 txtProcesosPendientes.setText(String.valueOf(--numProcesosPendientes));
             }
+        }
+        if (Character.toUpperCase(e.getKeyChar()) == 'B') {
+            procesoPausado = true;
+            System.out.println("Se preciona la B");
         }
     }
 
