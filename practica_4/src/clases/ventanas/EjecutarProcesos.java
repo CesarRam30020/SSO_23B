@@ -4,6 +4,7 @@ import clases.Proceso;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -20,7 +21,8 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
     Queue<Proceso> colaNuevos;
     Queue<Proceso> colaListos;
     Queue<Proceso> colaBloqueados;
-    Queue<Proceso> procesosTerminados; // Se pretende utilizar para mostrar BCP
+    Queue<Proceso> colaTerminados; // Se pretende utilizar para mostrar BCP
+    ArrayList<Proceso> todosProcesos;
     private static Timer timerAnimation;
     private int contadorGlobal = 0;
     private int numProcesosPendientes = 0;
@@ -32,6 +34,7 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
     private boolean hayInterrupcion = false;
     private final int MAXIMO_MEMORIA = 3;
     private final int TIEMPO_MAXIMO_BLOQUEADO = 10;
+    BcpProcesos bcp;
 
     public EjecutarProcesos() {
         initComponents();
@@ -43,7 +46,7 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
         tblColaBloqueados.getColumnModel().getColumn(0).setPreferredWidth(5);
         colaListos = new LinkedList<>();
         colaBloqueados = new LinkedList<>();
-        procesosTerminados = new LinkedList<>();
+        colaTerminados = new LinkedList<>();
     }
 
     public void inicializarPrograma(Queue<Proceso> listaProceso) {
@@ -136,7 +139,7 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
          * la cola de terminados, esto para que no se pierdan y se pueda
          * realizar la accion de la letra B.
          */
-        procesosTerminados.add(p);
+        colaTerminados.add(p);
     }
 
     public void iniciarSimulacion() {
@@ -676,6 +679,17 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
         if (Character.toUpperCase(e.getKeyChar()) == 'B') {
             procesoPausado = true;
             System.out.println("Se preciona la B");
+            //todosProcesos = new ArrayList<>();
+            //todosProcesos.addAll(colaNuevos);
+            //todosProcesos.addAll(colaListos);
+            //todosProcesos.addAll(colaBloqueados);
+            //todosProcesos.addAll(colaTerminados);
+            
+            bcp = new BcpProcesos();
+            bcp.inicializarPrograma(this,colaNuevos,
+                colaListos,colaBloqueados,colaTerminados);
+            bcp.setVisible(true);
+            this.setVisible(false);
         }
     }
 
