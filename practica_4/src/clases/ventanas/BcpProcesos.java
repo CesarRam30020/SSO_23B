@@ -25,10 +25,13 @@ public class BcpProcesos extends javax.swing.JFrame implements KeyListener {
      */
     public BcpProcesos() {
         initComponents();
+        this.setFocusable(true);
+        this.addKeyListener(this);
     }
     
-    public void inicializarPrograma(EjecutarProcesos ventanaPadre,Queue<Proceso> nuevos,Queue<Proceso> listos,
-        Queue<Proceso> bloqueados, Queue<Proceso> terminados) {
+    public void inicializarPrograma(EjecutarProcesos ventanaPadre,
+        Queue<Proceso> nuevos,Queue<Proceso> listos,Queue<Proceso> bloqueados,
+        Queue<Proceso> terminados, Proceso ejecucion) {
         this.ventanaPadre = ventanaPadre;
         this.nuevos = nuevos;
         this.listos = listos;
@@ -45,22 +48,34 @@ public class BcpProcesos extends javax.swing.JFrame implements KeyListener {
         
         for (Proceso p : this.listos) {
             model.addRow(new Object[]{p.obtenerID(),"Listo",p.obtenerDato1()
-                +p.obtenerOperacion()+p.obtenerDato2(),"N/A","N/A","N/A","N/A",
-                "N/A","N/A","N/A"});
+                +p.obtenerOperacion()+p.obtenerDato2(),p.obtenerTiempoLlegada(),
+                "N/A","N/A",p.obtenerTiempoEspera(),p.obtenerTiempoServicio(),
+                p.obtenerTiempoRestante(),"N/A"});
         }
         
         for (Proceso p : this.bloqueados) {
-            model.addRow(new Object[]{p.obtenerID(),"Bloqueado",p.obtenerDato1()
-                +p.obtenerOperacion()+p.obtenerDato2(),"N/A","N/A","N/A","N/A",
-                "N/A","N/A","N/A"});
+            model.addRow(new Object[]{p.obtenerID(),"Bloqueado (" +
+                p.obtenerContador() + ")",p.obtenerDato1()+p.obtenerOperacion()+
+                p.obtenerDato2(),p.obtenerTiempoLlegada(),"N/A","N/A",
+                p.obtenerTiempoEspera(),p.obtenerTiempoServicio(),
+                p.obtenerTiempoRestante(),"N/A"});
         }
         
         for (Proceso p : this.terminados) {
             model.addRow(new Object[]{p.obtenerID(),"Terminado",p.obtenerDato1()
                 +p.obtenerOperacion()+p.obtenerDato2()+" ("+
-                ((p.hayError())? "Error" : p.obtenerResultado()) +")","N/A",
-                "N/A","N/A","N/A","N/A","N/A","N/A"});
+                ((p.hayError())? "Error" : p.obtenerResultado()) +")",
+                p.obtenerTiempoLlegada(),p.obtenerTiempoFinalizacion(),
+                p.obtenerTiempoRetorno(),p.obtenerTiempoEspera(),
+                p.obtenerTiempoServicio(),p.obtenerTiempoEspera(),
+                p.obtenerTiempoRestante()});
         }
+        
+        model.addRow(new Object[]{ejecucion.obtenerID(),"Ejecución",
+            ejecucion.obtenerDato1()+ejecucion.obtenerOperacion()+
+            ejecucion.obtenerDato2(),ejecucion.obtenerTiempoLlegada(),"N/A",
+            "N/A",ejecucion.obtenerTiempoEspera(),"N/A",
+            ejecucion.obtenerTiempoEspera(),ejecucion.obtenerTiempoRestante()});
     }
 
     /**
@@ -160,15 +175,18 @@ public class BcpProcesos extends javax.swing.JFrame implements KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
+        System.out.println("KeyTyped");
         if (Character.toUpperCase(e.getKeyChar()) == 'C') {
             System.out.println("Si se preciona la C");
             this.setVisible(false);
             this.ventanaPadre.setVisible(true);
+            this.ventanaPadre.procesoPausado = false;
         }
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
+        System.out.println("KeyPressed");
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 

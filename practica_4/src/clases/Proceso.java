@@ -11,6 +11,9 @@ public class Proceso {
     private boolean interrumpido;
     private int contadorBloqueado;
     private int tiempoRestante;
+    private int tiempoLlegada;
+    private int tiempoFinalizacion;
+    
     public  Proceso(){
         this.ID = 0;
         this.operacion = ' ';
@@ -48,6 +51,13 @@ public class Proceso {
     public void establecerTiempoRestante(int tiempoRestante){
         this.tiempoRestante = tiempoRestante;
     }
+    public void establecerTiempoLlegada(int tiempoLlegada) {
+        this.tiempoLlegada = tiempoLlegada;
+    }
+    public void establecerTiempoFinalizacion(int tiempoFinalizacion) {
+        this.tiempoFinalizacion = tiempoFinalizacion;
+    }
+    
     public void incrementarContador(){
         this.contadorBloqueado++;
     }
@@ -78,6 +88,22 @@ public class Proceso {
     
     public boolean obtenerInterrumpido(){
         return this.interrumpido;
+    }
+    public int obtenerTiempoLlegada() {
+        return this.tiempoLlegada;
+    }
+    public int obtenerTiempoFinalizacion() {
+        return this.tiempoFinalizacion;
+    }
+    
+    public int obtenerTiempoRetorno() {
+        return this.tiempoFinalizacion - this.tiempoLlegada;
+    }
+    public int obtenerTiempoEspera() {
+        return this.obtenerTiempoRetorno() - this.obtenerTiempoServicio();
+    }
+    public int obtenerTiempoServicio() {
+        return this.obtenerTiempoRetorno();
     }
     
     public int obtenerContador(){

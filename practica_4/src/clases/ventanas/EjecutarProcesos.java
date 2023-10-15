@@ -22,6 +22,7 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
     Queue<Proceso> colaListos;
     Queue<Proceso> colaBloqueados;
     Queue<Proceso> colaTerminados; // Se pretende utilizar para mostrar BCP
+    Proceso procesoEjecucion;
     ArrayList<Proceso> todosProcesos;
     private static Timer timerAnimation;
     private int contadorGlobal = 0;
@@ -29,7 +30,7 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
     private int tiempoRestante = 0;
     private int tiempoEstimado = 0;
     private int tiempoTranscurrido = 0;
-    private boolean procesoPausado = false;
+    public boolean procesoPausado = false;
     private boolean hayError = false;
     private boolean hayInterrupcion = false;
     private final int MAXIMO_MEMORIA = 3;
@@ -124,6 +125,7 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
         txtID.setText("" + p.obtenerID());
         txtOperacion.setText("" + p.obtenerOperacion());
         txtTiempoEstimado.setText("" + p.obtenerTiempoEstimado());
+        procesoEjecucion = p;
     }
 
     public void actualizarProcesosTerminados(Proceso p) {
@@ -134,6 +136,7 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
             model.addRow(new Object[]{p.obtenerID(), p.obtenerDato1() + " " + p.obtenerOperacion() + " " + p.obtenerDato2(), p.obtenerResultado()});
         }
         
+        p.establecerTiempoFinalizacion(contadorGlobal);
         /**
          * Al momento de que se termine de ejecutar un proceso, este se añade a
          * la cola de terminados, esto para que no se pierdan y se pueda
@@ -236,7 +239,9 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
                         if (!colaListos.contains(p) && !p.obtenerInterrumpido()) {
                             actualizarProcesosTerminados(p);
                             if (!colaNuevos.isEmpty()) {
-                                colaListos.offer(colaNuevos.poll());
+                                Proceso p1 = colaNuevos.poll();
+                                p1.establecerTiempoLlegada(contadorGlobal);
+                                colaListos.offer(p1);
                                 actualizarColaListos(colaListos);
                                 actualizarProcesoEnEjecucion(new Proceso());
                                 txtTiempoTranscurrido.setText("" + 0);
@@ -687,7 +692,8 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
             
             bcp = new BcpProcesos();
             bcp.inicializarPrograma(this,colaNuevos,
-                colaListos,colaBloqueados,colaTerminados);
+                colaListos,colaBloqueados,colaTerminados,
+                procesoEjecucion);
             bcp.setVisible(true);
             this.setVisible(false);
         }

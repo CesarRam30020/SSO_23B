@@ -17,6 +17,8 @@ public class ListaProcesos {
         for(int i = 1; i <= cantidadProcesos; i++){
             Proceso p = new Proceso();
             p.establecerID(i);
+            if (i <= 3)
+                p.establecerTiempoLlegada(0);
             p.establecerDato1(new Random().nextInt(100)+1);
             p.establecerDato2(new Random().nextInt(100)+1);
             p.establecerOperacion(OPERACIONES[new Random().nextInt(5)]);
