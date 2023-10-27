@@ -35,6 +35,7 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
     private boolean hayInterrupcion = false;
     private final int MAXIMO_MEMORIA = 3;
     private final int TIEMPO_MAXIMO_BLOQUEADO = 10;
+    private int quantum;
     BcpProcesos bcp;
 
     public EjecutarProcesos() {
@@ -50,7 +51,8 @@ public class EjecutarProcesos extends JFrame implements KeyListener {
         colaTerminados = new LinkedList<>();
     }
 
-    public void inicializarPrograma(Queue<Proceso> listaProceso) {
+    public void inicializarPrograma(Queue<Proceso> listaProceso,int quantum) {
+        this.quantum = quantum;
         colaNuevos = listaProceso;
         numProcesosPendientes = colaNuevos.size();
         int aux = numProcesosPendientes;

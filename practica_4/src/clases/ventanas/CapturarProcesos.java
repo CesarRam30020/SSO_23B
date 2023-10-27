@@ -23,11 +23,13 @@ public class CapturarProcesos extends javax.swing.JFrame {
         lblProcesos = new javax.swing.JLabel();
         spCantidadProcesos = new javax.swing.JSpinner();
         btnAceptar = new javax.swing.JButton();
+        lblQuantum = new javax.swing.JLabel();
+        spQuantum = new javax.swing.JSpinner();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         lblProcesos.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
-        lblProcesos.setText("Ingresa la cantidad de procesos");
+        lblProcesos.setText("Ingresa la cantidad de procesos y");
 
         spCantidadProcesos.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         spCantidadProcesos.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
@@ -40,30 +42,46 @@ public class CapturarProcesos extends javax.swing.JFrame {
             }
         });
 
+        lblQuantum.setFont(new java.awt.Font("Segoe UI", 3, 24)); // NOI18N
+        lblQuantum.setText("El valor del Quantum");
+
+        spQuantum.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        spQuantum.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 27, Short.MAX_VALUE)
+                .addComponent(lblProcesos)
+                .addGap(16, 16, 16))
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(23, 23, 23)
-                        .addComponent(lblProcesos))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(151, 151, 151)
-                        .addComponent(spCantidadProcesos, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(132, 132, 132)
-                        .addComponent(btnAceptar, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(40, Short.MAX_VALUE))
+                        .addComponent(btnAceptar, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(85, 85, 85)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(spCantidadProcesos, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(spQuantum, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblQuantum))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(42, 42, 42)
+                .addGap(18, 18, 18)
                 .addComponent(lblProcesos)
-                .addGap(28, 28, 28)
-                .addComponent(spCantidadProcesos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(2, 2, 2)
+                .addComponent(lblQuantum)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(spCantidadProcesos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(spQuantum, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnAceptar)
                 .addContainerGap(83, Short.MAX_VALUE))
@@ -74,7 +92,7 @@ public class CapturarProcesos extends javax.swing.JFrame {
 
     private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAceptarActionPerformed
         lista = new ListaProcesos((int) spCantidadProcesos.getValue());
-        e.inicializarPrograma(lista.getColaProcesos());
+        e.inicializarPrograma(lista.getColaProcesos(), (int) spQuantum.getValue());
         e.setVisible(true);
         this.setVisible(false);
     }//GEN-LAST:event_btnAceptarActionPerformed
@@ -103,6 +121,8 @@ public class CapturarProcesos extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAceptar;
     private javax.swing.JLabel lblProcesos;
+    private javax.swing.JLabel lblQuantum;
     private javax.swing.JSpinner spCantidadProcesos;
+    private javax.swing.JSpinner spQuantum;
     // End of variables declaration//GEN-END:variables
 }
