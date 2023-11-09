@@ -1,6 +1,7 @@
-
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -75,6 +76,27 @@ class Ventana extends JFrame {
         add(panel);
         setVisible(true);
 
+        addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                // No se usa en este contexto
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                    System.exit(0);
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                // No se usa en este contexto
+            }
+        });
+
+        setFocusable(true);
+        requestFocusInWindow();
     }
 
     // Método para mostrar un pan en la ventana
